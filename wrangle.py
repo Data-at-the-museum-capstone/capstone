@@ -187,7 +187,7 @@ def first_part_clean(   df,
         ##adding columns back in for use in explore
         df = pd.concat([df,temp_df[dummy_columns]],axis=1)
     
-    return df
+    return df,dummy_columns
 
 
 def split_tvt_stratify(df, target,dummy_columns):
@@ -220,3 +220,15 @@ def split_tvt_stratify(df, target,dummy_columns):
     print(f"test -> {test.shape}")
 
     return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test
+
+def initalize_museum():
+    ''' 
+    initalizes for consistency, no input, copy outputs
+    '''
+    target = "is_highlight"
+    df = get_art()
+    df = filter_artist_cols(df)
+    df,dummy_columns = first_part_clean(df)
+    X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test = split_tvt_stratify(df,target,dummy_columns)
+
+    return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target
