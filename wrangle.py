@@ -163,8 +163,8 @@ def first_part_clean(   df,
             df.loc[df[each].isin(idx), each] = 'Other'
 
     #get dummies for X subsets
-    temp_df = df.copy()
     if len(dummy_columns)>0:
+        temp_df = df.copy()
         df = pd.get_dummies(df, columns=dummy_columns, drop_first=False)
         ##adding columns back in for use in explore
         df = pd.concat([df,temp_df[dummy_columns]],axis=1)
