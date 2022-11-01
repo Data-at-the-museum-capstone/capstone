@@ -190,14 +190,14 @@ def first_part_clean(   df,
     return df
 
 
-def split_tvt_stratify(df, target):
+def split_tvt_stratify(df, target,dummy_columns):
     """
     takes in a dataframe, splits it into 60, 20, 20, 
     and seperates out the x variables and y (target) as new df/series
     """
     from sklearn.model_selection import train_test_split
     # split df into test (20%) and train_validate (80%)
-    train_validate, test = train_test_split(df, test_size=0.2, random_state=123,stratify = df[target])
+    train_validate, test = train_test_split(df.drop(columns=dummy_columns), test_size=0.2, random_state=123,stratify = df[target])
 
     # split train_validate off into train (70% of 80% = 56%) and validate (30% of 80% = 24%)
     train, validate = train_test_split(train_validate, test_size=0.25, random_state=123,stratify = train_validate[target])
