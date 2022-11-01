@@ -14,9 +14,46 @@ def filter_artist_cols(art):
     separator = '|'
 
     
-    art.drop(columns=['artist_prefix', 'artist_display_name', 
-                      'artist_display_bio','artist_suffix',
-                      'artist_wikidata_url'], inplace=True)
+    art.drop(columns=[  'artist_prefix',
+                        'object_id', 
+                        'artist_display_name', 
+                        'artist_display_bio',
+                        'artist_suffix',
+                        'geography_type',
+                        'city', 
+                        'state', 
+                        'county', 
+                        'region', 
+                        'subregion', 
+                        'locale', 
+                        'locus', 
+                        'excavation', 
+                        'river', 
+                        'rights_and_reproduction', 
+                        'metadata_date',
+                        'object_date',
+                        'object_end_date',
+                        'dimensions',
+                        'geography_type',
+                        'city',
+                        'state',
+                        'county',
+                        'region',
+                        'subregion',
+                        'locale',
+                        'locus',
+                        'excavation',
+                        'river',
+                        'rights_and_reproduction',
+                        'link_resource',
+                        'metadata_date',
+                        'repository',
+                        'tags_aat_url',
+                        'tags_wikidata_url',
+                        "reign",
+                        "dynasty",
+                        "period",
+                        'artist_wikidata_url'], inplace=True)
 
     # Artist Role
     # Role of the artist related to the type of artwork or object that was created
@@ -94,10 +131,10 @@ def filter_artist_cols(art):
 
 # 
 def first_part_clean(   df,
-                        consolidate_threshold=.001,
-                        consolidate_list=["culture","gallery_number","object_name"],
+                        consolidate_threshold=.01,
+                        consolidate_list=["culture","gallery_number","object_name","credit_line","medium"],
                         group_to_decade=True,
-                        dummy_columns = ['gallery_number','department','object_name',"culture"]
+                        dummy_columns = ['gallery_number','department','object_name',"culture","credit_line","medium"]
                     ):
     ''' 
     inputs: gonna need data frame, the rest can be left as default or modified as deemed necessary
@@ -117,10 +154,6 @@ def first_part_clean(   df,
     
     returns: modified dataframe
     '''
-    
-    ## dropping object_number due to basically being a unique key and should not have signifcant value (info contained within is parsed into other features)
-    ## same with object_id
-    df.drop(columns=["object_id"],inplace=True)
 
     ## ascension year, turning unknown into 0 so that they're not removed, may be able to impute with logical leaps/unknown value in doing so (case by case basis)
     df["accessionyear"] = df["accessionyear"].replace("NaN",0).fillna(0).astype("string").str[:4].astype(int)
@@ -149,9 +182,6 @@ def first_part_clean(   df,
     ## turning portfolio into boolean (all values seem to be individual, only 4 in target)
     df["portfolio"] = np.where(df.portfolio.isna(),False,True)
 
-    #dropping reign, dynasty, and period, values are too independant and do not seem incongruent with main dataset
-    df.drop(columns=["reign","dynasty","period"],inplace=True)
-
     #culture seems to be worth keeping at the moment
 
     ## consolidates low value counts
@@ -170,3 +200,5 @@ def first_part_clean(   df,
         df = pd.concat([df,temp_df[dummy_columns]],axis=1)
     
     return df
+
+
