@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import re
 from sklearn.model_selection import train_test_split
+import os
 
 
 def get_art():
@@ -272,17 +273,44 @@ def split_data(df, strat_by, rand_st=123):
     return train, validate, test
 
 
-def initalize_museum():
+def initalize_museum(new= False):
     ''' 
     initalizes for consistency, no input, copy outputs
     '''
-    target = "is_highlight"
-    df = get_art()
-    df = filter_artist_cols(df)
-    df,dummy_columns = first_part_clean(df)
-    X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test = split_tvt_stratify(df,target,dummy_columns)
+    
+    if new == True:
+        
+        target = "is_highlight"
+        df = get_art()
+        df = filter_artist_cols(df)
+        df,dummy_columns = first_part_clean(df)
+        X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test = split_tvt_stratify(df,target,dummy_columns)
 
-    return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target
+        data_list = [X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target]
+
+        pd.to_pickle(data_list, 'data_list')
+
+        return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target
+    else:
+        filename = "data_list"
+        # if file is available locally, read it
+        if os.path.isfile(filename):
+            data_list = pd.read_pickle(filename)
+            X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target =  data_list
+            return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target
+        
+        # if file not available locally, acquire data from source csv
+        # and write it as pickle locally for future use
+        else:
+            print('''\n
+            There is no chached file available, pleas run again with Parameter: new = True
+            The results will be cached for faster access in the future.
+                        Timed at 1.9s vs the 15.2s to get anew
+
+            Thank you for you patience.
+            ''')
+            return np.arange(11)
+
 
 def weighted_fields(df, target, fields_to_weigh: list):
     '''
