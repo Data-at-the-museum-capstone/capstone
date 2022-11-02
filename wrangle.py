@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import re
+from sklearn.model_selection import train_test_split
 
 
 def get_art():
-    art = pd.read_csv('MetObjects.txt')
+    art = pd.read_csv('MetObjects.csv')
     art.rename(columns=lambda c: c.lower().replace(' ','_'), inplace=True)
 
     return art
@@ -122,7 +123,10 @@ def first_part_clean(   df,
                         consolidate_threshold=.01,
                         consolidate_list=["culture","gallery_number","object_name","credit_line","medium"],
                         group_to_decade=True,
-                        dummy_columns = ['gallery_number','department','object_name',"culture","credit_line","medium"]
+                        dummy_columns = ['gallery_number','department','object_name',"culture","credit_line","medium"],
+                        weight_columns = ['country', 'tags', 'classification', 'credit_line', 'medium', ],
+                        drop_whence_weighed = False,
+                        one_if_exists = ['object_wikidata_url', ]
                     ):
     ''' 
     inputs: gonna need data frame, the rest can be left as default or modified as deemed necessary
@@ -172,6 +176,19 @@ def first_part_clean(   df,
 
     #culture seems to be worth keeping at the moment
 
+    # fix pipes in country field
+    df["country"] = fix_pipes(df["country"])
+
+    # run fields that should be 1 if something even just exists through this ;)
+    for field in one_if_exists:
+        df = make_1_if_exists(df, field)
+
+    # And this runs the list of weight columns through the weighing process
+    df = weighted_fields(df, 'is_highlight', weight_columns)
+
+    # if you set drop_whence_weigh to True then it'll drop them, elswise keeps
+    if drop_whence_weighed: df.drop(columns= weight_columns, inplace=True)
+
     ## consolidates low value counts
     if len(consolidate_list)>0:
         for each in consolidate_list:
@@ -187,15 +204,14 @@ def first_part_clean(   df,
         ##adding columns back in for use in explore
         df = pd.concat([df,temp_df[dummy_columns]],axis=1)
     
-    return df,dummy_columns
+    return df, dummy_columns
 
 
-def split_tvt_stratify(df, target,dummy_columns):
+def split_tvt_stratify(df, target, dummy_columns):
     """
     takes in a dataframe, splits it into 60, 20, 20, 
     and seperates out the x variables and y (target) as new df/series
     """
-    from sklearn.model_selection import train_test_split
     # split df into test (20%) and train_validate (80%)
     train_validate, test = train_test_split(df, test_size=0.2, random_state=123,stratify = df[target])
 
@@ -226,6 +242,36 @@ def split_tvt_stratify(df, target,dummy_columns):
 
     return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test
 
+
+def fix_pipes(series_in_frame):
+    output = series_in_frame.fillna('None').str.split('|')
+    output = output.apply(lambda x: x[0])
+    return output
+
+def split_data(df, strat_by, rand_st=123):
+    '''
+    Takes in: a pd.DataFrame()
+          and a column to stratify by  ;dtype(str)
+          and a random state           ;if no random state is specifed defaults to [123]
+          
+      return: train, validate, test    ;subset dataframes
+    '''
+    # split the training and validation data off from the test data
+    # the test data will be .2 of the dataset
+    train, test = train_test_split(df, test_size=.2, 
+                               random_state=rand_st, stratify=df[strat_by])
+    train, validate = train_test_split(train, test_size=.25, 
+                 random_state=rand_st, stratify=train[strat_by])
+    print(f'Prepared df: {df.shape}')
+    print()
+    print(f'Train: {train.shape}')
+    print(f'Validate: {validate.shape}')
+    print(f'Test: {test.shape}')
+
+
+    return train, validate, test
+
+
 def initalize_museum():
     ''' 
     initalizes for consistency, no input, copy outputs
@@ -237,3 +283,73 @@ def initalize_museum():
     X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test = split_tvt_stratify(df,target,dummy_columns)
 
     return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target
+
+def weighted_fields(df, target, fields_to_weigh: list):
+    '''
+    takes in the df, the target variable, and a list of field(s) to weigh
+
+    using the training set it weighs the field for frequency of
+
+    occurrences both in and out of the target set
+
+    subtracts the frequency in the non-target set from that in the target set
+
+    NaNs are dropped from the result and the weights are mapped using the original field
+
+    anytyhing not in the weighted set is automatically zero
+
+    Returns: the df with a new field weighted accordingly
+    '''
+    # fillna
+    for x in fields_to_weigh:
+        df[x] = df[x].fillna('None')
+    # Split the data
+    train, validate, test = split_data(df, strat_by= target)
+    # loop through each field in the list of fields_to_weigh
+    for x in fields_to_weigh:
+
+        # get the value_counts for in target and out of target values in the fields_to_weigh list
+        field_true_target = train[train[target] == True][x].value_counts()
+        field_false_target = train[~train[target] == True][x].value_counts()
+    # Divide the resultant values by their sums
+        field_true_target = field_true_target / field_true_target.sum()
+
+        field_false_target = field_false_target / field_false_target.sum()
+    # Make them DataFrames
+        field_true_target = pd.DataFrame(field_true_target)
+
+        field_false_target = pd.DataFrame(field_false_target)
+    # create a new combined field
+        field_true_target['combined'] = field_true_target - field_false_target
+
+    # only use values above zero
+        field_weights = field_true_target.combined[field_true_target.combined > 0]
+
+    # make a new field name with weighed added on to it
+        new_field_name = x + '_weighed'
+
+    # use the new_field_name and map the weights in
+        df[new_field_name] = df[x].map(lambda x: 0 if x not in field_weights.index else field_weights.loc[x])
+
+# return the DataFrame with the new field in it
+    return df
+
+def make_1_if_exists(df, col_to_use):
+    '''
+    
+    '''
+    # fillna with zeros
+    df[col_to_use] = df[col_to_use].fillna(0)
+
+    new_col = col_to_use + '_1_or_0'
+
+    df[new_col] = df[col_to_use].map(lambda x: 0 if x == 0 else 1)
+
+    return df
+
+def start():
+    print('''
+    X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test, df, target = initalize_museum()
+    
+    ''')
+    
