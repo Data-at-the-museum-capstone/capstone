@@ -1,7 +1,19 @@
-# <a name="top"></a>TELCO - CLASSIFICATION PROJECT
+# <a name="top"></a>DATA AT THE MUSEUM
 ![]()
 
-by: Dan Churchill
+by: Geary Shenck, David Howell and Dan Churchill
+
+<p>
+  <a href="https://github.com/geary-shenck" target="_blank">
+    <img alt="Geary" src="https://img.shields.io/github/followers/geary-shenck?label=Follow_Geary&style=social" />
+  </a>
+</p>
+
+<p>
+  <a href="https://github.com/David-Howell" target="_blank">
+    <img alt="David" src="https://img.shields.io/github/followers/david-howell?label=Follow_David&style=social" />
+  </a>
+</p>
 
 <p>
   <a href="https://github.com/DanChurchill" target="_blank">
@@ -24,11 +36,11 @@ ___
 
 
 ## <a name="project_description"></a>Project Description:
-The purpose of this project is to aquire customer data for the Telco Company from a database, create a model to predict customer churn, and utilize that model to make predictions from a group of customers
+The purpose of this project is to have a purpose
 
-Goal 1: Create a model that can predict churn with greater accuracy than baseline
+Goal 1: This is the first Goal
 
-Goal 2: Find drivers for customer churn at Telco and make recommendations to improve retention
+Goal 2: This is the second Goal
 
 
 [[Back to top](#top)]
@@ -38,15 +50,14 @@ Goal 2: Find drivers for customer churn at Telco and make recommendations to imp
 
 
 ### Project Outline:
-- Acquire data from the Codeup Database using a function saved in an acquire.py file to import into the Final Report Notebook.
-- Perform initial data exploration to determine what preparations the data needs to undergo.
-- Clean and prepare data utilizing a function saved in a prepare.py, and prepare data in Final Report Notebook by importing and using the funtion.
-- Clearly define two hypotheses, set an alpha, run statistical tests needed to reject or fail to reject the Null Hypothesis, and document findings and takeaways.
+- Acquire data 
+- Perform initial data exploration 
+- Clean and prepare data 
+- Clearly define 
 - Establish a baseline accuracy.
-- Train three different classification models.
-- Evaluate models on train and validate datasets.
-- Choose the model with that performs the best and evaluate that single model on the test dataset.
-- Create csv file with the customer id, the probability that the customer has churned, and the model's prediction for each observation in my test dataset.
+- Train  models.
+- Evaluate models 
+
 - Document conclusions, takeaways, and next steps in the Final Report Notebook.
 
 [[Back to top](#top)]
@@ -56,7 +67,7 @@ Goal 2: Find drivers for customer churn at Telco and make recommendations to imp
 
 | Target Attribute | Definition | Data Type |
 | ----- | ----- | ----- |
-| churn | 1 if the customer has churned | int |
+| is_highlight | True if the item has been classified as a significant work | bool |
 
 
 ---
@@ -103,17 +114,17 @@ Goal 2: Find drivers for customer churn at Telco and make recommendations to imp
 
 ## <a name="wrangle"></a>Data Acquisition and Preparation
 
-Data is acquired from the Codeup Database server using an SQL query within the modular function get_telco_data located in the acquire.py file.  This returns a dataframe containing 7043 rows and 23 columns of data
+Data is acquired from...  This returns a dataframe containing ... rows and ... columns of data
 
-Preparation is performed using the modular function prep_telco located in the prepare.py file.  This function performs the following on the data:
+Preparation is performed using 
 
-- Deletes the id columns that contained redundent information
-- Converted total_charges from a string to a float
-    * NOTE: There were 11 entries of 0 for total_charges, but in each case the tenure was also 0 indicating they were new customers; no values were imputed because this was a logical value
+- transformations
+- Conversions
+    * NOTE: There was weird stuff
 - Encoded categorical and binary columns using 1-hot encoding
-- Renamed some columns for brevity
-- Created 'addon_count' column, a count of how many internet add-ons each customer has
-- Split Data into 80% Train, 20% Validate, and 20% Test using 'Churn' as stratification
+- Renamed columns
+- Created features
+- Split Data into 80% Train, 20% Validate, and 20% Test using 'is_highlight' as stratification
 
 
 
@@ -126,40 +137,28 @@ Preparation is performed using the modular function prep_telco located in the pr
 
 ## <a name="explore"></a>Data Exploration:
 
-### Correlation Testing
-The first step was to explore each variable's linear correlation using a custom modular function correlation_report located in the explore.py file.  This function accepts a dataframe (in this case our training dataset) and a target column (in this case our target variable 'churn'),  The function performs a correlation test on each column, sorts the absolute values, and returns two tables with the 11 strongest correlations, and the 11 weakest correlations.
+### First Testing
+The first step was to
 
 Correlation test takeaways:
- - Contract types, internet, payment by check, and not having internet add-ons showed higher correlation to churn
- - Phone service, gender, and multiple lines showed lower correlation to churn
 
-### Exploring Internet Service
+
+### Exploring XXXX
 The training data was split into subsets of those that did and did not have internet service to see which was more likely to churn. 
 
-- **Hypothesis**
-- $H_0$: There is no difference in churn between those with and without internet service
-- $H_a$: There is a significant difference in churn between those with and without internet service
 
-We failed to confirm the null hypothesis and confirmed via visualization that customers without internet service were more likely to churn
 
-### Exploring Number of Internet Service Add-Ons
+
+### Exploring YYY 
 To explore why internet users were more likely to churn we then utilized the add-on_count column by using a $Chi^2$ test
 
-- **Hypothesis**
-- $H_0$: 'Churn is independent of the number of add-on services'
-- $H_a$: 'Churn is dependent on the number of add-on services'
 
-We failed to confirm the null hypothesis and confirmed via visualization that customers with fewer add-on services were more likely to churn
-
-### Exploring Monthly Charges and Internet Service Add-Ons
-We saw that monthly charges correlated to churn, and that more add-ons meant higher churn.  Looking at the breakdown visually we were able to see that customers that paid more for the same number of add-ons churned at a higher rate.
+### Exploring ZZZ
+We saw 
 
 
 ### Takeaways from exploration:
-- We've identified that internet customers churn at a higher rate
-- Internet customers with fewer add-on services, and those that pay more for internet services, churn more
-- Gender, phone service, and multiple lines are our least significant indicators of churn
-- During modeling we'll begin with the features we determined to be most important
+- We took some things away
 
 [[Back to top](#top)]
 
@@ -207,13 +206,13 @@ We saw that monthly charges correlated to churn, and that more add-ons meant hig
 
 ## <a name="conclusion"></a>Conclusion and Next Steps:
 
-- We created a churn classification model that beat the baseline prediction by more than 7%
+- We created classification model that was awesome
 
-- The customers that our model predicted as more likely-churned, but who haven't churned yet, should be incentivized to remain customers 
+- Here's more
 
-- Customers with Internet Service (particularly those that do not have add-ons) are more likely to churn, especially if their bills are higher.  Making the add-ons less expensive could help retain customers longer.
+- But wait, there's even more
 
-- Shorter contract types showed higher correlation to churn, and given more time I would have explored that further to determine what other factors drove those customers to churn
+- Final ground-breaking finding
 
 [[Back to top](#top)]
 
@@ -221,7 +220,7 @@ We saw that monthly charges correlated to churn, and that more add-ons meant hig
 
 ## <a name="reproduce"></a>Steps to Reproduce:
 
-You will need your own env.py file with database credentials then follow the steps below:
+You will need the source file and follow the :
 
   - Download the acquire.py, prepare.py, explore.py, and final_report.ipynb files
   - Add your own env.py file to the directory (user, host, password)
