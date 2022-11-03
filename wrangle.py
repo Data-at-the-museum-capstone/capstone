@@ -219,6 +219,8 @@ def split_tvt_stratify(df, target, dummy_columns):
     # split train_validate off into train (70% of 80% = 56%) and validate (30% of 80% = 24%)
     train, validate = train_test_split(train_validate, test_size=0.25, random_state=123,stratify = train_validate[target])
 
+    train,validate,test = get_kmeans_cluster_features(train,validate,test,target)
+
     # split train into X (dataframe, drop target) & y (series, keep target only)
     X_train = train.drop(columns=[target])
     y_train = train[target]
@@ -381,3 +383,74 @@ def start():
     
     ''')
     
+
+def get_kmeans_cluster_features(train,validate,test,target):
+    ''' 
+    takes in your three datasets to apply the new featuers to as well as applying to the base datasets
+    a dictionary (iterable lists with the last being the order of clustering (function to auto later))
+    '''
+    import warnings
+    warnings.filterwarnings("ignore")
+    dict_to_cluster={}
+    dict_to_cluster.update({"cluster_strong_yes":[ 'department_The Libraries', 
+                                            'department_European Paintings', 
+                                            'department_Robert Lehman Collection', 
+                                            'department_The Cloisters', 
+                                            'department_The American Wing', 
+                                            'department_Musical Instruments', 
+                                            'department_Modern and Contemporary Art',
+                                            "is_timeline_work", 
+                                            'object_name_Painting', 
+                                            'culture_American', 
+                                            "medium_None"
+                                            ],
+                        "cluster_strong_no":[  'department_Drawings and Prints', 
+                                        'department_Asian Art', 
+                                        'department_European Sculpture and Decorative Arts', 
+                                        'object_name_Print', 
+                                        'department_Greek and Roman Art',
+                                        'credit_line_The Jefferson R. Burdick Collection, Gift of Jefferson R. Burdick',
+                                        'object_name_Kylix fragment',
+                                        "portfolio"
+                                    ],
+                            })
+
+    from sklearn.cluster import KMeans
+    #list has to be same len as clusters, sorts clusters into high and low eff
+    threshold_list=[.75,.001]
+
+    for i in list(dict_to_cluster):
+        #set features
+        #print(i,dict_to_cluster[i])
+        #X1 = train[train[i]==1][dict_to_cluster[i]]
+        #X2 = validate[validate[i]==1][dict_to_cluster[i]]
+        #X3 = test[test[i]==1][dict_to_cluster[i]]
+        X1 = train[dict_to_cluster[i]]
+        X2 = validate[dict_to_cluster[i]]
+        X3 = test[dict_to_cluster[i]]
+
+        kmeans_scaled = KMeans(n_clusters=21,random_state=123)
+        kmeans_scaled.fit(X1)
+
+        X1["cluster"] = kmeans_scaled.predict(X1)
+        X2["cluster"] = kmeans_scaled.predict(X2)
+        X3["cluster"] = kmeans_scaled.predict(X3)
+
+        train[f"{i}"] = X1["cluster"]
+        validate[f"{i}"] = X2["cluster"]
+        test[f"{i}"] = X3["cluster"]
+
+    for num,i in enumerate(list(dict_to_cluster)):
+        series1 = train.groupby([f"{i}"])[target].mean()
+        series2 = validate.groupby([f"{i}"])[target].mean()
+        series3 = test.groupby([f"{i}"])[target].mean()
+        if num == 0:
+            train[f"{i}"] = np.where(train[f"{i}"].isin(series1[series1>.75].index.tolist()),1,0)
+            validate[f"{i}"] = np.where(validate[f"{i}"].isin(series2[series2>.75].index.tolist()),1,0)
+            test[f"{i}"] = np.where(test[f"{i}"].isin(series3[series3>.75].index.tolist()),1,0)
+        if num == 1:
+            train[f"{i}"] = np.where(train[f"{i}"].isin(series1[series1<.001].index.tolist()),1,0)
+            validate[f"{i}"] = np.where(validate[f"{i}"].isin(series2[series2<.001].index.tolist()),1,0)
+            test[f"{i}"] = np.where(test[f"{i}"].isin(series3[series3<.001].index.tolist()),1,0)
+
+    return train,validate,test
