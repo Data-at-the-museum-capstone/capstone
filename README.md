@@ -1,5 +1,5 @@
 # <a name="top"></a>DATA AT THE MUSEUM
-![]()
+![george_crossing_the_delaware](https://github.com/Data-at-the-museum-capstone/capstone/blob/main/george_w_words.PNG)
 
 by: Geary Shenck, David Howell and Dan Churchill
 
