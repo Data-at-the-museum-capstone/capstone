@@ -6,16 +6,16 @@ by: Geary Shenck, David Howell and Dan Churchill
 <p>
   <a href="https://github.com/geary-shenck" target="_blank">
     <img alt="Geary" src="https://img.shields.io/github/followers/geary-shenck?label=Follow_Geary&style=social" />
-  </a>
-</p>
+  </a> &emsp; 
 
-<p>
+
+
   <a href="https://github.com/David-Howell" target="_blank">
     <img alt="David" src="https://img.shields.io/github/followers/david-howell?label=Follow_David&style=social" />
-  </a>
-</p>
+  </a> &emsp;
 
-<p>
+
+
   <a href="https://github.com/DanChurchill" target="_blank">
     <img alt="Dan" src="https://img.shields.io/github/followers/DanChurchill?label=Follow_Dan&style=social" />
   </a>
@@ -24,7 +24,7 @@ by: Geary Shenck, David Howell and Dan Churchill
 
 ***
 [[Project Description](#project_description)]
-[[Project Planning](#planning)]
+[[Project Outline](#outline)]
 [[Data Dictionary](#dictionary)]
 [[Data Acquire and Prep](#wrangle)]
 [[Data Exploration](#explore)]
@@ -36,29 +36,22 @@ ___
 
 
 ## <a name="project_description"></a>Project Description:
-The purpose of this project is to have a purpose
-
-Goal 1: This is the first Goal
-
-Goal 2: This is the second Goal
+The NY Metropolitan Museum classifies roughly 2400 of their 480,000 items as ‘Highlights’.  Our team used supervised and unsupervised learning techniques to determine what factors contribute to an item being a highlight, and created a model to predict whether an item in the collection should be identified as such.  This model could be used by the Met to determine what pieces to feature in upcoming exhibitions, or by other museums to identify what underappreciated items to request on loan for their galleries.
 
 
 [[Back to top](#top)]
 
 ***
-## <a name="planning"></a>Project Planning: 
+## <a name="outline"></a>Project Outline: 
 
-
-### Project Outline:
-- Acquire data 
-- Perform initial data exploration 
-- Clean and prepare data 
-- Clearly define 
-- Establish a baseline accuracy.
-- Train  models.
-- Evaluate models 
-
-- Document conclusions, takeaways, and next steps in the Final Report Notebook.
+- Data Acquisition from the Metropolitan Museum Open Access page
+- Initial data exploration 
+- Clean and prepare data
+- Define what factors contribute to an artwork being a highlight
+- Establish a baseline for evaluating model accuracy
+- Create and train predictive models
+- Evaluate models
+- Document conclusions, takeaways, and next steps
 
 [[Back to top](#top)]
 ***
@@ -73,40 +66,34 @@ Goal 2: This is the second Goal
 ---
 | Feature | Definition | Data Type |
 | ----- | ----- | ----- |
-| customer_id | Unique id for each customer| string |
-| senior_citizen| 1 if customer is a senior citizen | int |
-| tenure | Months of tenure as a customer| int |
-| monthly_charges| The customer's monthly bill| float |
-| total_charges| The customer's total bills since they have been a customer| float|
-| male | 1 if the customer is male | int |
-| partner | 1 if the customer has a partner  | int |
-| dependents | 1 if the customer has dependents | int |
-| phone | 1 if the customer has phone service | int |
-| paperless_billing | 1 if the customer has paperliess billing | int |
-| multiple_lines_yes | 1 if the customer has multiple phone lines | int |
-| online_security_no | 1 if the customer has internet but no online security | int |
-| online_security_yes | 1 if the customer has online security add-on | int |
-| online_backup_no | 1 if the customer has internet but no online backup | int |
-| online_backup_yes | 1 if the customer has online backup | int |
-| device_protection_no | 1 if the customer has internet but no device protection | int |
-| device_protection_yes | 1 if the customer has device protection | int |
-| tech_support_no | 1 if the customer has internet but no tech support | int |
-| tech_support_yes | 1 if the customer has tech_support | int |
-| streaming_tv_no | 1 if the customer has internet but no streaming tv | int |
-| streaming_tv_yes | 1 if the customer has streaming tv | int |
-| streaming_movies_no | 1 if the customer has internet but no streaming movies | int |
-| streaming_movies_yes | 1 if the customer has streaming movies | int |
-| contract_type_month-to-month | 1 if the customer has a month-to-month contract | int |
-| contract_type_one_year | 1 if the customer has a one year contract  | int |
-| contract_type_two_year | 1 if the customer has a two year contract | int |
-| payment_type_bank_transfer_auto | 1 if the customer pays by automatic bank transfer | int
-| payment_type_credit_card_auto | 1 if the customer pays automatically by credit card | int
-| payment_type_electronic_check | 1 if the customer pays manually by electronic check | int
-| payment_type_mailed_check | 1 if the customer pays manually by mailed check | int
-| internet_type_dsl  | 1 if the customer has DSL internet service |  int
-| internet_type_fiber_optic | 1 if the customer has fiber optic internet service | int
-| internet_type_none | 1 if the customer has no internet | int
-| addon_count | sum of how many internet service add-ons the customer has | int
+| object_number | Unique id for each object| string |
+| title | Title, identifying phrase, or name given to an object | string |
+| is_timeline_work | True if object was in the 'Timeline of Art History' exhibit | bool |
+| is_public_domain | True indicates an artwork in the Public Domain | bool |
+| accessionyear | Year the artwork was acquired by the museum| int |
+| portfolio | True if the object was part of a set or series of works | True |
+| constituent_id | unique id for the constituent | object |
+| artist_role | the role of the constituent (artist, maker, author, etc.  | object |
+| artist_alpha_sort | constituent name in format first, last | object |
+| artist_nationality | National, geopolitical, cultural, or ethnic origin of the constituent | object |
+| artist_begin_date | Year of birth for the constituent | object |
+| artist_end_date | Year of death for the constituent (9999 if living) | object |
+| artist_gender | Gender of the constituent | object |
+| has_artist_url | True if the constituent has a ULAN artist page | bool |
+| object_begin_date | Year creation of the object began | int |
+| country | Country where the artwork was created or found | object |
+| classification | General term describing the artwork type | object |
+| object_wikidata_url | URL for object's wikidata page| object |
+| tags | Primary subject keyword tag associated with the object | object |
+| object_wikidata_url_1_or_0 | 1 if the object has a wikidata URL | int |
+| gallery_number | Gallery number where the object is currently displayed | int |
+| department | The curatorial department responsible for the object | object |
+| object_name | The physical type of the object | object |
+| culture | Information about the culture, or people from which an object was created | object |
+| credit_line | Source or origin of the artwork and the year the object was acquired  | object |
+| medium | Materials that were used to create the artwork | object |
+
+** Some of the columns above were transformed or encoded prior to modeling.  The transformed column names are ommitted for brevity
 
 [[Back to top](#top)]
 
@@ -114,17 +101,22 @@ Goal 2: This is the second Goal
 
 ## <a name="wrangle"></a>Data Acquisition and Preparation
 
-Data is acquired from...  This returns a dataframe containing ... rows and ... columns of data
+Data is acquired in .csv format from <a href="https://github.com/metmuseum/openaccess" target="_blank">The Metropolitan Museum's Open Access Site
+  
 
-Preparation is performed using 
 
-- transformations
-- Conversions
-    * NOTE: There was weird stuff
-- Encoded categorical and binary columns using 1-hot encoding
-- Renamed columns
-- Created features
-- Split Data into 80% Train, 20% Validate, and 20% Test using 'is_highlight' as stratification
+This returns a dataframe containing 477804 rows and 54 columns of data
+
+Preparation is performed using preparation functions contained in the wrangle.py file.  The following operations were performed: 
+
+- lowercase and remove whitespace from all column names
+- Removed insignificant columns, duplicate columns, or columns without valid values
+- Many columns had mulitple values separated by a '|'.  In these cases we only kept the first entry, which was the primary value.
+- Converted dates to retain only digits for the year
+- Artist gender only contained Female designations, so imputed male or N/A based upon values in other columns
+- Converted portfolio and similar columns from categorical columns to boolean to reduce dimensionality
+- Created binary dummy columns for remaining categorical features 
+- Split Data into 80% Train, 20% Validate, and 20% Test using our target variable 'is_highlight' for stratification
 
 
 
