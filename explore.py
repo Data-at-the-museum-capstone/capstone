@@ -102,8 +102,8 @@ def chi2_for_feature(df,feature):
     chi2, p, degf, expected = stats.chi2_contingency(df1.iloc[:,-2:])
 
     alpha = .05
-    H0 = (f"Department is not different in the porportions of Is Highlight")
-    H1 = (f"Department is different in the porportions of Is Highlight")
+    H0 = (f"{feature.title().replace('_',' ')} is not different in the porportions of Is Highlight")
+    H1 = (f"{feature.title().replace('_',' ')} is different in the porportions of Is Highlight")
     #print('Observed')
     #print(df1.values)
     #print('---\nExpected')
