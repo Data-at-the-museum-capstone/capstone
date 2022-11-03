@@ -170,7 +170,6 @@ def first_part_clean(   df,
 
     ## replacing nan with unknown for title name
     df["title"] = df["title"].fillna("Unknown")
-    df.drop(columns="title",inplace=True)
 
     ## turning portfolio into boolean (all values seem to be individual, only 4 in target)
     df["portfolio"] = np.where(df.portfolio.isna(),False,True)
