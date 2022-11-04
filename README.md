@@ -93,7 +93,7 @@ The NY Metropolitan Museum classifies roughly 2400 of their 480,000 items as ‘
 | credit_line | Source or origin of the artwork and the year the object was acquired  | object |
 | medium | Materials that were used to create the artwork | object |
 
-** Some of the columns above were transformed or encoded prior to modeling.  The transformed column names are ommitted for brevity
+** Additionally, some of the columns above were transformed or encoded prior to modeling, creating ~50 more features.  The transformed column names are ommitted for brevity
 
 [[Back to top](#top)]
 
@@ -129,44 +129,71 @@ Preparation is performed using preparation functions contained in the wrangle.py
 
 ## <a name="explore"></a>Data Exploration:
 
-### First Testing
-The first step was to
+### Initial Correlation Testing
+We explored the correlation of features using Chi<sup>2</sup> testing to show which columns had the most imbalanced proportions of highlight objects.  
 
 Correlation test takeaways:
+Is_timeline_work, is_public_domain, gallery_number_0, object_Fragment, medium_None, as well as some specific departments and culture types will be worth investigating.
+
+### Investigating Departments
+Exploring whether departments contain inequal proportions of highlight objects with enough deviation to be significant
+
+H<sub>0</sub>:  The count of values for each department will not be significantly different from each other in proportion
+
+H<sub>a</sub>:  The count of values for each department will be significantly different from each other in proportion
+
+Testing confirmed that we could reject the null hypothesis for some departments.  There are unequal porportions of highlights within The Libraries, European Paintings, Robert Lehman Collection, The Cloisters, The American Wing, Musical Instruments, and Modern and Contemporary Art.
+
+In other departments, the null hypothesis could not be rejected.  Drawings and Prints, Asian Art, European Sculpture and Decorative Arts, Photographs,  and Greek and Roman Art had highlight items in expected proportions.
 
 
-### Exploring XXXX
-The training data was split into subsets of those that did and did not have internet service to see which was more likely to churn. 
 
+### Investigating Object type
+Exploring whether certain object types contain inequal proportions of highlights with enough deviation to be significant
 
+H<sub>0</sub>:  The count of values for each object type will not be significantly different from each other in proportion
+  
+H<sub>a</sub>:  The count of values for each object type will be significantly different from each other in proportion
 
+Testing confirmed that we could reject the null hypothesis for some object types.  There are unequal porportions of highlights within Paintings and Miscellaneous Ojects
 
-### Exploring YYY 
-To explore why internet users were more likely to churn we then utilized the add-on_count column by using a $Chi^2$ test
+For other object types, the null hypothesis could not be rejected.  Books, Fragments, Kylix, Negatives, Pieces, and Prints had highlight items in expected proportions
 
+### Exploring The Outliers in the Libraries
+After observing an unexpectedly high rate of highlight items in the Libraries Department we explored further to see if there was a bias we could capture. 
+By grouping features it was discovered that Library pieces that were highlighted were more likely to have more information on the piece, and were more skewed toward an American target audience (Culture Type:  American, Gallery:  American Wing)
 
-### Exploring ZZZ
-We saw 
+### Using Unsupervised Learning
+Using K-means clustering we were able to identify a cluster that had a strong positive correlation to objects identified as highlights.  The cluster contained items with no medium identified, American culture, object name of Painting, part of the 'timeline' exhibition, and belonging to a specific subset of specific departments.  We tested this using Chi<sup>2</sup> testing against the following hypothesis:
+  
+H<sub>0</sub>:  The proportion of highlights for the cluster is not significantly different from the proportion of highlights in the overall population
+  
+H<sub>a</sub>:  The proportion of highlights for the cluster is significantly different from the proportion of highlights in the overall population
 
+The test results allowed us to reject our null hypothesis.  In addition to this being a good feature for modeling, the few items in this cluster that are not highlights would be items that possibly should be.
 
 ### Takeaways from exploration:
-- We took some things away
+- We identified some factors that drive highlights, used unsupervised learning to segment portions of our data, and created some features to carry forward to our model
 
 [[Back to top](#top)]
 
 ***
 
 ## <a name="model"></a>Modeling:
+  
+Our target variable, is_highlight, is only true for .5% of items in the dataset.  
 
-#### Training Dataset
+First tested using ###### model with ##### features and %%%%% parameters
+  
+#### Training Dataset (fill in actual results here)
 | Model | Accuracy | f1 score |
 | ---- | ---- | ---- |
 | Baseline | 0.74| N/A |
-| K-Nearest Neighbor | 0.80 | 0.53 |  
+| K-Nearest Neighbor | 0.80 | 0.53 |     
 | Random Forest | 0.81 | 0.58 |  
 | Logistic Regression | 0.80 | 0.60 |  
 
-#### Validation Dataset
+#### Validation Dataset (fill in actual results here)
 | Model | Accuracy | f1 score |
 | ---- | ---- | ---- |
 | Baseline | 0.74| N/A |
@@ -175,20 +202,21 @@ We saw
 | Logistic Regression | 0.78 | 0.56 |  
 
 
-- The Logistic Regression model performed the best
-
+- The Second Model
+  
+  ###### Fill in data here
 
 ## Testing the Model
 
-- Logistic Regression Results on Test Data
+-  Results on Test Data
 
-#### Testing Dataset
+#### Testing Dataset (fill in actual results here)
              precision    recall  f1-score   support
 
            0       0.85      0.90      0.87      1035
            1       0.66      0.56      0.61       374
 
-    accuracy                           0.81      1409
+    accuracy                           0.81      1409     
     macro avg      0.76      0.73      0.74      1409
     weighted avg   0.80      0.81      0.80      1409
 
@@ -198,13 +226,9 @@ We saw
 
 ## <a name="conclusion"></a>Conclusion and Next Steps:
 
-- We created classification model that was awesome
+- Our model showed limited ability to predict whether or not an item is a significant 'highlight' work, which shows that judging art is in the eye of the beholder and not so much in data.
 
-- Here's more
 
-- But wait, there's even more
-
-- Final ground-breaking finding
 
 [[Back to top](#top)]
 
@@ -212,10 +236,8 @@ We saw
 
 ## <a name="reproduce"></a>Steps to Reproduce:
 
-You will need the source file and follow the :
-
-  - Download the acquire.py, prepare.py, explore.py, and final_report.ipynb files
-  - Add your own env.py file to the directory (user, host, password)
-  - Run the final_repot.ipynb notebook
+  - Download the wrangle.py, explore.py and final notebook files from this repository
+  - Download the latest data csv from <a href="https://github.com/metmuseum/openaccess" target="_blank">The Metropolitan Museum's Open Access Site
+  - Run the final_report.ipynb notebook
 
 [[Back to top](#top)]
