@@ -183,42 +183,32 @@ The test results allowed us to reject our null hypothesis.  In addition to this 
   
 Our target variable, is_highlight, is only true for .5% of items in the dataset.  
 
-First tested using ###### model with ##### features and %%%%% parameters
+Testing first with XGBClassifier with a max depth of 10 performaned well in-sample, but lagged behind in out of sample data making a strong argument for being considered over-fit.
+
+Extreme Gradient Boost with Binary Logistic Regression was the best model that did not lead to massive overfitting moving forward. Acheieving 50% Recall with 75% Precision
   
-#### Training Dataset (fill in actual results here)
-| Model | Accuracy | f1 score |
+#### Training Dataset 
+| Precision | Recall | f1 score |
 | ---- | ---- | ---- |
-| Baseline | 0.74| N/A |
-| K-Nearest Neighbor | 0.80 | 0.53 |     
-| Random Forest | 0.81 | 0.58 |  
-| Logistic Regression | 0.80 | 0.60 |  
+| .97 | .90 | .93 |
+ 
 
-#### Validation Dataset (fill in actual results here)
-| Model | Accuracy | f1 score |
+#### Validation Dataset 
+| Precision | Recall | f1 score |
 | ---- | ---- | ---- |
-| Baseline | 0.74| N/A |
-| K-Nearest Neighbor | 0.78 | 0.47 |  
-| Random Forest | 0.79 | 0.53 |  
-| Logistic Regression | 0.78 | 0.56 |  
+| .75 | .50 | .75 |
 
 
-- The Second Model
-  
-  ###### Fill in data here
+#### Testing Dataset 
+| Precision | Recall | f1 score |
+| ---- | ---- | ---- |
+| .78 | .52 | .63 |
 
-## Testing the Model
+Test model Takeaway
 
--  Results on Test Data
+Improves on baseline Recall from 0.5% to an incredible 50%.
+Precision is maintained at 75% showing the model only selcts out of target peices 25% of the time.
 
-#### Testing Dataset (fill in actual results here)
-             precision    recall  f1-score   support
-
-           0       0.85      0.90      0.87      1035
-           1       0.66      0.56      0.61       374
-
-    accuracy                           0.81      1409     
-    macro avg      0.76      0.73      0.74      1409
-    weighted avg   0.80      0.81      0.80      1409
 
 [[Back to top](#top)]
 
@@ -236,7 +226,7 @@ First tested using ###### model with ##### features and %%%%% parameters
 
 ## <a name="reproduce"></a>Steps to Reproduce:
 
-  - Download the wrangle.py, explore.py and final notebook files from this repository
+  - Download the wrangle.py, explore.py, model.py and final notebook files from this repository
   - Download the latest data csv from <a href="https://github.com/metmuseum/openaccess" target="_blank">The Metropolitan Museum's Open Access Site
   - Run the final_report.ipynb notebook
 
