@@ -100,6 +100,12 @@ class make_model:
 
     '''
     def __init__(self, X, y, X_val, y_val, model_name, scoring_method= 'recall', maximum_depth= None, learning_rate = 1):
+        
+        # Map the False and True values to 0 and 1 respectively. 
+        # This way the model doesn't spit out that future warning
+        y = y.map({False: 0, True: 1})
+        y_val = y_val.map({False: 0, True: 1})
+        
         self.train = [X, y]
         self.validate = [X_val, y_val]
         self.name = model_name
