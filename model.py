@@ -220,6 +220,8 @@ class make_model:
                 ''')
 
     def test(self, X_test, y_test):
+        y_test = y_test.map({False: 0, True: 1})
+
         self.test_preds = self.model.predict(X_test).round().astype('int')
 
         self.recall['test'] = recall_score(y_test, self.test_preds)
