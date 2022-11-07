@@ -59,7 +59,7 @@ def prep_X_sets(X_train: pd.DataFrame, X_validate: pd.DataFrame, X_test: pd.Data
     'object_begin_date',
     'country',
     'classification',
-    #  'object_wikidata_url',
+     'object_wikidata_url',
     'tags',
     #  'gallery_number',
     #  'department',
@@ -67,6 +67,10 @@ def prep_X_sets(X_train: pd.DataFrame, X_validate: pd.DataFrame, X_test: pd.Data
     #  'culture',
     #  'credit_line',
     #  'medium',
+    'title',
+    'portfolio',
+    'cluster_strong_yes',
+    'cluster_strong_no',
     ]  
 
     for x in X:
@@ -194,7 +198,8 @@ class make_model:
 
             for x in range(1,(tests + 1)):
                 tree = self.model_.set_params(max_depth=x)
-                score = cross_validate(tree, self.train[0], self.train[1], cv=cv, scoring= self.scoring)['test_score'].mean()
+                the_cross = cross_validate(tree, self.train[0], self.train[1], cv=cv, scoring= self.scoring)
+                score = the_cross['test_score'].mean()
                 results.append([x, score])
                 
             pd.DataFrame(results, columns = ['max_depth', self.scoring])\
