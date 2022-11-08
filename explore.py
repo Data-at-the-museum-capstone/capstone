@@ -136,3 +136,137 @@ def chi2_for_feature(df,feature):
                     wspace=0.2,
                     hspace=0.4)
     plt.show()
+
+
+
+
+
+def the_sankey(count_threshold_min=3):
+    ''' 
+    no input, everything is self contained (theo)
+    creates a sankey function, gets new df, groups, and creates sankey from gorup
+    plotly shows the results
+    '''
+    import pandas as pd
+
+    # Helper function to transform regular data to sankey format
+    # Returns data and layout as dictionary
+    def genSankey(df,cat_cols=[],value_cols='',title='Sankey Diagram'):
+        ''' 
+        sankey diagram, this is not very intuitive.
+        it takes a very particular input and can create relations based on feature flow (columns in df)
+        needs a count to aggregate size on
+        '''
+        # maximum of 6 value cols -> 6 colors
+        colorPalette = ['#4B8BBE','#306998','#FFE873','#FFD43B','#646464',"FF0000","0000FF","00FF00","F0000F","0F0F00","00F0F0"]
+        labelList = []
+        colorNumList = []
+        for catCol in cat_cols:
+            labelListTemp =  list(set(df[catCol].values))
+            colorNumList.append(len(labelListTemp))
+            labelList = labelList + labelListTemp
+            
+        # remove duplicates from labelList
+        labelList = list(dict.fromkeys(labelList))
+        
+        # define colors based on number of levels
+        colorList = []
+        for idx, colorNum in enumerate(colorNumList):
+            colorList = colorList + [colorPalette[idx]]*colorNum
+            
+        # transform df into a source-target pair
+        for i in range(len(cat_cols)-1):
+            if i==0:
+                sourceTargetDf = df[[cat_cols[i],cat_cols[i+1],value_cols,"culture"]]
+                sourceTargetDf.columns = ['source','target','count',"culture"]
+            else:
+                tempDf = df[[cat_cols[i],cat_cols[i+1],value_cols,"culture"]]
+                tempDf.columns = ['source','target','count',"culture"]
+                sourceTargetDf = pd.concat([sourceTargetDf,tempDf])
+            
+            #sourceTargetDf = sourceTargetDf.groupby(['source','target']).agg({'count':'sum'}).reset_index()
+
+        prior = sourceTargetDf
+
+        # add index for source-target pair
+        sourceTargetDf['sourceID'] = sourceTargetDf['source'].apply(lambda x: labelList.index(x))
+        sourceTargetDf['targetID'] = sourceTargetDf['target'].apply(lambda x: labelList.index(x))
+
+        all = sourceTargetDf["count"].sum()
+        sourceTargetDf["percentage"] = (round(((sourceTargetDf["count"]/all)*100),3).astype(str) + "%")
+        ###################################
+
+        # creating the sankey diagram
+        data = dict(
+            type='sankey',
+            #domain = dict(x = [0,1], y = [0,1]),
+            node = dict(pad = 50, thickness = 15,
+                        line = dict(color = "black",  width = 0.05),
+                        label = labelList,color = colorList
+                        ),
+            link = dict(
+            source = sourceTargetDf['sourceID'],
+            target = sourceTargetDf['targetID'],
+            value = sourceTargetDf['count'],
+            label = sourceTargetDf["percentage"]
+            )
+        )
+        
+        layout =  dict(title = title,font = dict(  size = 10), width=1200, height=800)
+
+        fig = dict(data=[data], layout=layout)
+
+        return fig,sourceTargetDf, prior
+
+    #worried about data cleaning affecting what was done previously so pulling in new df
+    art = pd.read_csv('MetObjects.csv')
+    art.rename(columns=lambda c: c.lower().replace(' ','_'), inplace=True)
+
+    art.department = art.department.fillna("Unlisted")
+    art.object_name = art.object_name.fillna("Unstated")
+    art.culture = art.culture.fillna("Unknown")
+    art.medium = art.medium.fillna("N/A")
+
+
+    #makes a group of features previously investigated
+    group1 = art[art["is_highlight"]].groupby(["department","object_name","culture","medium"])["is_highlight"].agg(["sum"]).reset_index().sort_values(by="sum")
+
+    for each in group1.department.value_counts()[group1.department.value_counts() == 1].index:
+        group1.department.replace(each,"Misc",inplace=True)
+    for ele in group1.department.value_counts()[group1.department.value_counts() <= count_threshold_min].index:
+        group1.department.replace(ele,"Other",inplace=True)
+
+    for each in group1.object_name.value_counts()[group1.object_name.value_counts() == 1].index:
+        group1.object_name.replace(each,"Misc",inplace=True)
+    for ele in group1.object_name.value_counts()[group1.object_name.value_counts() <= count_threshold_min].index:
+        group1.object_name.replace(ele,"Other",inplace=True)
+
+    for each in group1.culture.value_counts()[group1.culture.value_counts() == 1].index:
+        group1.culture.replace(each,"Various",inplace=True)
+    for ele in group1.culture.value_counts()[group1.culture.value_counts() <= count_threshold_min].index:
+        group1.culture.replace(ele,"Other",inplace=True)
+
+    for each in group1.medium.value_counts()[group1.medium.value_counts() == 1].index:
+        group1.medium.replace(each,"Misc",inplace=True)
+    for ele in group1.medium.value_counts()[group1.medium.value_counts() <= count_threshold_min].index:
+        group1.medium.replace(ele,"Other",inplace=True)
+
+
+    #goes thorugh featuers and adds the column name to each unique in column for readability in sankey
+    for ele in group1.columns:
+        if ele != "sum":
+            group1[ele]=f"{ele} " + group1[ele].astype(str)
+    group1 = group1[group1["sum"]>=count_threshold_min]
+
+    #plots the results
+    import plotly
+    fig,play,prior = genSankey( group1, group1.drop(columns="sum").columns.tolist(),
+                                "sum",
+                                title='Flow of Highlighted Pieces for select Features')
+
+
+
+
+    plotly.offline.iplot(fig, validate=False)
+
+        
